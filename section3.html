@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 3</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Passwords</h1>
+        <nav>
+            <ul>
+                <li><a href="section1.html" class="nav-link">Encoding</a></li>
+                <li><a href="section2.html" class="nav-link">Encryption</a></li>
+                <li><a href="section3.html" class="nav-link active">Passwords</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Password Strength Checker</h2>
+            <form id="passwordForm">
+                <div>
+                    <label for="password">Enter Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password...">
+                </div>
+                <br>
+                <button type="submit">Submit</button>
+            </form>
+            <div id="passwordStrength"></div>
+            <div id="passwordBreaches"></div>
+        </section>
+    </main>
+
+
+    <script>
+        const passwordForm = document.getElementById("passwordForm");
+        const passwordInput = document.getElementById("password");
+        const passwordStrengthDisplay = document.getElementById("passwordStrength");
+        const passwordBreachesDisplay = document.getElementById("passwordBreaches");
+
+        passwordForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const password = passwordInput.value;
+
+            // Calculate SHA-1 hash of the password using CryptoJS libary
+            const sha1Hash = CryptoJS.SHA1(password).toString(CryptoJS.enc.Hex);
+
+            // Extract the first 5 characters of the hashed password
+            const hashPrefix = sha1Hash.substring(0, 5).toUpperCase();
+
+            // Send request to the Pwned Passwords API
+            try {
+                const response = await fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`);
+                if (response.ok) {
+                    const responseBody = await response.text();
+                    // Check if the hash prefix exists in the response
+                    const breaches = parsePasswordBreaches(responseBody, sha1Hash.substring(5).toUpperCase());
+
+                    const strength = calculatePasswordStrength(password);
+                    // Display the strength and breaches
+                    passwordStrengthDisplay.textContent = `Password Strength: ${getStrengthLabel(strength)}`;
+                    passwordBreachesDisplay.textContent = breaches === 0 ? "No breaches found for this password." : `This password has been breached ${breaches} times.`;
+                } else {
+                    throw new Error("An error occurred while checking the password breaches.");
+                }
+            } catch (error) {
+                console.error(error);
+                passwordBreachesDisplay.textContent = "An error occurred while checking the password breaches.";
+            }
+
+            // Function to calculate password strength based on inclusion of special characters, numbers, capitals and length
+            function calculatePasswordStrength(password) {
+                let strength = 0;
+
+                // Check for minimum length
+                if (password.length >= 12) {
+                    strength += 1;
+                }
+
+                // Check for at least 1 number
+                if (/\d/.test(password)) {
+                    strength += 1;
+                }
+
+                // Check for at least 1 capital letter
+                if (/[A-Z]/.test(password)) {
+                    strength += 1;
+                }
+
+                // Check for at least 1 special character
+                if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+                    strength += 1;
+                }
+
+                return strength;
+            }
+
+            // Parses the response from the API
+            function parsePasswordBreaches(responseBody, suffix) {
+                const lines = responseBody.split("\n");
+                for (const line of lines) {
+                    const [hashSuffix, count] = line.split(":");
+                    if (hashSuffix === suffix) {
+                        return parseInt(count);
+                    }
+                }
+                return 0;
+            }
+
+            // Translates the numeric strength to a word for ease of reading
+            function getStrengthLabel(strength) {
+                switch(strength) {
+                    case 1:
+                        return "Very Weak";
+                    case 2:
+                        return "Weak";
+                    case 3:
+                        return "Strong";
+                    case 4:
+                        return "Very Strong";
+                    // Default here is 'Terrible' could in theory lead to a bug where a strong password could present as terrible
+                    default:
+                        return "Terrible";
+                }
+            }
+        });
+    </script>
+</body>
+</html>

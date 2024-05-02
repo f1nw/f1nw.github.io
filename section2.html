@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 2</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Encrypting</h1>
+        <nav>
+            <ul>
+                <li><a href="section1.html" class="nav-link">Encoding</a></li>
+                <li><a href="section2.html" class="nav-link active">Encryption</a></li>
+                <li><a href="section3.html" class="nav-link">Passwords</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Hashing</h2>
+            <div>
+                <label for="hashAlgorithm">Select Hashing Algorithm:</label>
+                <select id="hashAlgorithm">
+                    <option value="sha1">SHA-1</option>
+                    <option value="md5">MD5</option>
+                </select>
+                <br>
+                <label for="inputTextHash">Input String for Hashing:</label>
+                <textarea id="inputTextHash" placeholder="Enter text..." rows="4"></textarea>
+                <br>
+                <button onclick="hashText()">Hash</button>
+                <br>
+                <label for="outputHash">Hashed Result:</label>
+                <textarea id="outputHash" placeholder="Hashed result will appear here..." rows="4" readonly></textarea>
+            </div>
+        </section>
+    </main>
+
+
+    <script>
+        // Uses below functions to hash the input with selected algorithm
+        function hashText() {
+            const selectedAlgorithm = document.getElementById("hashAlgorithm").value;
+            const inputText = document.getElementById("inputTextHash").value;
+            let hashedText;
+            if (selectedAlgorithm === "sha1") {
+                hashedText = sha1(inputText);
+            } else if (selectedAlgorithm === "md5") {
+                hashedText = md5(inputText);
+            }
+            document.getElementById("outputHash").value = hashedText;
+        }
+
+        // SHA-1 hashing function
+        function sha1(str) {
+            const sha1Hash = CryptoJS.SHA1(str);
+            return sha1Hash.toString(CryptoJS.enc.Hex);
+        }
+
+        // MD5 hashing function
+        function md5(str) {
+            const md5Hash = CryptoJS.MD5(str);
+            return md5Hash.toString(CryptoJS.enc.Hex);
+        }
+    </script>
+</body>
+</html>

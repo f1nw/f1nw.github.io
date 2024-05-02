@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 1</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Encoding</h1>
+        <nav>
+            <ul>
+                <li><a href="section1.html" class="nav-link active">Encoding</a></li>
+                <li><a href="section2.html" class="nav-link">Encryption</a></li>
+                <li><a href="section3.html" class="nav-link">Passwords</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Encoder/Decoder</h2>
+            <div>
+                <h3>Base64</h3>
+                <p>Enter text to encode or decode:</p>
+                <textarea id="inputTextBase64" placeholder="Enter text..." rows="4"></textarea>
+                <br>
+                <button onclick="encodeBase64('inputTextBase64', 'outputTextBase64')">Encode</button>
+                <button onclick="decodeBase64('inputTextBase64', 'outputTextBase64')">Decode</button>
+                <br>
+                <textarea id="outputTextBase64" placeholder="Result will appear here..." rows="4" readonly></textarea>
+            </div>
+            <div>
+                <h3>Base16 (Hexadecimal)</h3>
+                <p>Enter text to encode or decode:</p>
+                <textarea id="inputTextBase16" placeholder="Enter text..." rows="4"></textarea>
+                <br>
+                <button onclick="encodeBase16('inputTextBase16', 'outputTextBase16')">Encode</button>
+                <button onclick="decodeBase16('inputTextBase16', 'outputTextBase16')">Decode</button>
+                <br>
+                <textarea id="outputTextBase16" placeholder="Result will appear here..." rows="4" readonly></textarea>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        //String to base64
+        function encodeBase64(inputId, outputId) {
+            const inputText = document.getElementById(inputId).value;
+            const encodedText = btoa(inputText);
+            document.getElementById(outputId).value = encodedText;
+        }
+        //Base64 to string
+        function decodeBase64(inputId, outputId) {
+            const inputText = document.getElementById(inputId).value;
+            let decodedText;
+            try {
+                decodedText = atob(inputText);
+            } catch (e) {
+                decodedText = "Invalid Base64 input.";
+            }
+            document.getElementById(outputId).value = decodedText;
+        }
+        //String to hex
+        function encodeBase16(inputId, outputId) {
+            const inputText = document.getElementById(inputId).value;
+            const encodedText = stringToHex(inputText);
+            document.getElementById(outputId).value = encodedText.toUpperCase();
+        }
+        //Hex to string
+        function decodeBase16(inputId, outputId) {
+            const inputText = document.getElementById(inputId).value;
+            let decodedText;
+            try {
+                decodedText = hexToString(inputText);
+            } catch (e) {
+                decodedText = "Invalid Base16 input.";
+            }
+            document.getElementById(outputId).value = decodedText;
+        }
+        //Sub function to encode to hex character by character
+        function stringToHex(str) {
+            let hex = '';
+            for (let i = 0; i < str.length; i++) {
+                hex += str.charCodeAt(i).toString(16).padStart(2, '0');
+            }
+            return hex;
+        }
+        //Sub function to decode to string charcter by character 
+        function hexToString(hex) {
+            let str = '';
+            for (let i = 0; i < hex.length; i += 2) {
+                str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            }
+            return str;
+        }
+    </script>
+</body>
+</html>
