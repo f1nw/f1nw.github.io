@@ -101,14 +101,10 @@
 
             // Parses the response from the API
             function parsePasswordBreaches(responseBody, suffix) {
-                const lines = responseBody.split("\n");
-                for (const line of lines) {
-                    const [hashSuffix, count] = line.split(":");
-                    if (hashSuffix === suffix) {
-                        return parseInt(count);
-                    }
-                }
-                return 0;
+                const regex = new RegExp(`^${suffix}:([0-9]+)$`, 'm');
+                const match = responseBody.match(regex);
+                return match ? parseInt(match[1]) : 0;
+            
             }
 
             // Translates the numeric strength to a word for ease of reading
